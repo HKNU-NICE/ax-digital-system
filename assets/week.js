@@ -619,7 +619,7 @@ function comparePrediction(pred, seed) {
 
 function runCompare() {
   const sid = $("sid").value.trim();
-  if (!/^\d{6,10}$/.test(sid)) { setStatus.in("err", "먼저 학번을 넣어 주세요."); return; }
+  if (!/^\d{6,10}$/.test(sid)) { needSid(); return; }
   const saved = loadLocal(W.id + "-pre");
   const pred = saved?.predict || predictAnswers();
   S.cmp = comparePrediction(pred, seedFrom(sid));
@@ -749,9 +749,9 @@ function runFail(conId, r, extra) {
 
 async function runPractice() {
   const sid = $("sid").value.trim();
-  if (!/^\d{6,10}$/.test(sid)) { setStatus.in("err", "먼저 학번을 넣어 주세요."); return; }
+  if (!/^\d{6,10}$/.test(sid)) { needSid(); return; }
   const code = $("p-code").value;
-  if (!code.trim()) { setStatus.in("err", "앞 단계의 코드를 입력해 주세요."); return; }
+  if (!code.trim()) { nearMsg("p-console", "앞 단계의 코드를 입력해 주세요."); return; }
 
   $("p-run").disabled = true; $("p-badge").hidden = true;
   $("p-console").hidden = false; $("p-console").textContent = "";
@@ -785,9 +785,9 @@ async function runPractice() {
 
 async function runDesign() {
   const sid = $("sid").value.trim();
-  if (!/^\d{6,10}$/.test(sid)) { setStatus.in("err", "먼저 학번을 넣어 주세요."); return; }
+  if (!/^\d{6,10}$/.test(sid)) { needSid(); return; }
   const code = $("code").value;
-  if (!code.trim()) { setStatus.in("err", "코드를 작성해 주세요."); return; }
+  if (!code.trim()) { nearMsg("console", "코드를 작성해 주세요."); return; }
 
   $("run").disabled = true; $("run-badge").hidden = true;
   $("console").hidden = false; $("console").textContent = "";
@@ -823,7 +823,7 @@ async function runDesign() {
 
 async function runHunt() {
   const sid = $("sid").value.trim();
-  if (!/^\d{6,10}$/.test(sid)) { setStatus.in("err", "먼저 학번을 넣어 주세요."); return; }
+  if (!/^\d{6,10}$/.test(sid)) { needSid(); return; }
   const code = $("tx-hunt_code").value;
   $("hunt-run").disabled = true; $("hunt-badge").hidden = true;
   $("hunt-console").hidden = false; $("hunt-console").textContent = "";
@@ -977,6 +977,26 @@ function extraFiles(inputId, dropId, listId, set) {
       ? fs.map((f) => `${f.name} (${(f.size / 1024).toFixed(0)} KB)`).join(" · ")
       : "아직 고른 파일이 없습니다 · 한 파일당 8 MB 까지";
   });
+}
+
+/* 버튼 옆에서 바로 보이게 — 학번 칸으로 데려가고 깜빡인다 */
+function needSid() {
+  setStatus.in("err", "먼저 학번을 넣어 주세요.");
+  const el = $("sid"); if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  el.focus(); el.classList.add("need");
+  setTimeout(() => el.classList.remove("need"), 2600);
+  if (!document.getElementById("sid-toast")) {
+    const t = document.createElement("div");
+    t.id = "sid-toast"; t.className = "toast-need";
+    t.textContent = "맨 위에 학번과 이름을 넣고 [시작] 을 누른 뒤 다시 실행하세요.";
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 4000);
+  }
+}
+function nearMsg(conId, msg) {
+  const c = $(conId); if (!c) { setStatus.in("err", msg); return; }
+  c.hidden = false; c.textContent = ""; conLine(conId, msg, "no");
 }
 
 const setStatus = {};
