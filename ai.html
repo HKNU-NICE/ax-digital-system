@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 학습법 · AX 디지털시스템</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .x-unused{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.55rem;margin-top:1rem}
+  .cyc{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:.75rem .8rem}
+  .cyc .n{font-family:var(--f-mono);font-size:.75rem;color:var(--muted)}
+  .cyc b{display:block;font-size:1rem;margin:.1rem 0 .35rem}
+  .cyc p{margin:0;font-size:.84rem;color:var(--muted);line-height:1.55}
+  .roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:.55rem;margin-top:1rem}
+  .role{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:.7rem .85rem}
+  .role .wk{font-family:var(--f-mono);font-size:.75rem;color:var(--accent-ink)}
+  .role b{display:block;margin:.15rem 0 .25rem}
+  .role p{margin:0;font-size:.84rem;color:var(--muted);line-height:1.5}
+  .tpl{margin-top:1.1rem}
+  .tpl pre{white-space:pre-wrap;font-family:var(--f-mono);font-size:.82rem;line-height:1.6;
+           background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:.8rem .9rem;margin:.4rem 0 0}
+  .ok-tag{color:var(--pass);font-weight:600}
+  .no-tag{color:var(--fail);font-weight:600}
+  @media (max-width:760px){.x-unused{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="wrap">
+  <div class="brand">AX 디지털시스템<small>한경국립대학교 · ICT로봇공학전공</small></div>
+  <div class="spacer"></div>
+  <a class="btn" href="index.html">주차 목록</a>
+  <button class="btn" id="theme" type="button">테마</button>
+</div></header>
+
+<section class="hero"><div class="wrap">
+  <div class="eyebrow">AX 디지털시스템 · AI 학습법</div>
+  <h1>설계는 내가, AI 는 리뷰·검증 파트너</h1>
+  <p>디지털 회로 설계에서 AI 는 그럴듯한 코드를 빠르게 내놓지만, 그 코드가 사양대로 동작하는지는 알려 주지 않습니다.
+     그래서 이 과목은 AI 에게 <b>코드를 받아 쓰는 법</b>이 아니라 <b>AI 가 내놓은 것을 판정하는 법</b>을 익힙니다.
+     판정의 근거는 언제나 <b>사양 문장, GHDL 채점기, waveform, 보드</b>입니다.</p>
+</div></section>
+
+<main><div class="wrap">
+
+<section class="step">
+  <div class="step-head"><span class="step-no">1</span><h2>한 학기 동안 AI 를 쓰는 자리</h2></div>
+  <p class="lead">AI 를 쓰는 범위는 학기가 지나며 넓어집니다. 그러나 <b>매주 과제 코드는 AI 없이</b> 씁니다.
+    판정할 눈은 직접 써 본 사람에게만 생기기 때문입니다.</p>
+  <div class="roles">
+    <div class="role"><span class="wk">1~3주</span><b>개념 질문만</b>
+      <p>개념 확인을 먼저 혼자 풀고, 틀린 개념을 AI 에게 묻습니다. 설명이 슬라이드와 다르면 질문 칸에 적어 옵니다.</p></div>
+    <div class="role"><span class="wk">4~7주</span><b>AI 코드 감별</b>
+      <p>실습 회로를 AI 에게 시켰을 때 나온 코드에 든 버그를 <b>AI 없이</b> 찾아 고칩니다. 채점기가 못 잡는 버그도 하나씩 숨어 있습니다.</p></div>
+    <div class="role"><span class="wk">8주</span><b>AI 없음</b>
+      <p>중간고사.</p></div>
+    <div class="role"><span class="wk">9~11주</span><b>AI 리뷰 판정</b>
+      <p>AI 없이 쓴 과제를 AI 에게 리뷰받고, 지적 세 개가 맞는지 근거를 들어 판정합니다. 고친 코드는 받지 않습니다.</p></div>
+    <div class="role"><span class="wk">12~15주</span><b>프로젝트 리뷰 파트너</b>
+      <p>팀이 먼저 설계하고, AI 는 검토 · 경계값 아이디어 · 오류 메시지 풀이에 씁니다. 최종 보고서에 <b>AI 결과의 오류를 고친 사례 2건</b>을 적습니다.</p></div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="step-head"><span class="step-no">2</span><h2>판정의 근거는 네 가지뿐</h2></div>
+  <p class="lead">"AI 가 그렇다고 했다" 는 근거가 아닙니다. 아래 넷 중 하나로 확인한 것만 근거로 적습니다.</p>
+  <table class="spec">
+    <thead><tr><th>근거</th><th>무엇을 보나</th><th>예</th></tr></thead>
+    <tbody>
+      <tr><td><b>사양 문장</b></td><td>설계 사양 표와 문장을 코드와 한 줄씩 대조</td><td>"reset 이 로드보다 우선" 인데 코드는 en 을 먼저 본다</td></tr>
+      <tr><td><b>GHDL 채점기</b></td><td>사이트의 실행 버튼 — MISMATCH 메시지의 입력과 기댓값</td><td><code>MISMATCH d=1011 seg=… expected=…</code></td></tr>
+      <tr><td><b>waveform</b></td><td>MISMATCH 가 난 step 의 clock 에서 무슨 일이 있었나</td><td>max 가 15 가 된 다음 clock 에야 올라간다</td></tr>
+      <tr><td><b>보드 · Quartus</b></td><td>Latch 경고, pin assignment, 실제 동작</td><td>blank 를 올렸는데 segment 가 꺼지지 않는다</td></tr>
+    </tbody>
+  </table>
+  <p class="q-hint">채점기가 PASS 를 줘도 끝이 아닙니다. 채점기는 정해 둔 입력만 봅니다 — sensitivity list 누락, edge 방향처럼 simulation 에서 드러나지 않는 버그는 사양 문장으로만 잡힙니다.</p>
+</section>
+
+<section class="step">
+  <div class="step-head"><span class="step-no">3</span><h2>VHDL 에서 AI 가 자주 틀리는 것</h2></div>
+  <p class="lead">4~7주 「AI 코드 감별」 에 나오는 버그도, 9~11주 AI 리뷰를 판정할 때 대조할 기준도 이 표에서 나옵니다.</p>
+  <table class="spec">
+    <thead><tr><th>AI 가 내놓는 것</th><th>왜 문제인가</th><th>어떻게 알아채나</th></tr></thead>
+    <tbody>
+      <tr><td><code>std_logic_arith</code>, <code>std_logic_unsigned</code></td><td>표준이 아닌 옛 라이브러리. <code>numeric_std</code> 와 섞으면 오류</td><td>맨 위 <code>use</code> 줄</td></tr>
+      <tr><td>포트 · entity 이름을 바꿔 줌</td><td>채점기와 보드 TOP 이 못 찾음</td><td>컴파일 오류 · 프롬프트에 포트표를 그대로</td></tr>
+      <tr><td><code>if</code> 에 <code>else</code> 가 없음, <code>case</code> 에 <code>others</code> 가 없음</td><td>latch 가 생김</td><td>Quartus 의 Latch 경고 · 사이트의 synthesis 점검</td></tr>
+      <tr><td>sensitivity list 에서 신호를 빠뜨림</td><td>simulation 과 실제 회로가 다르게 동작</td><td><code>process</code> 괄호 안 목록</td></tr>
+      <tr><td><code>wait for</code>, <code>after 10 ns</code> 를 설계 코드에</td><td>synthesis 불가 — testbench 에서만 쓰는 구문</td><td>사이트 실행 결과 「synthesis 불가」</td></tr>
+      <tr><td>분주한 신호를 clock 으로 씀</td><td>보드에서 불안정 — 이 과목은 clock enable 방식</td><td>6–7주 슬라이드와 대조</td></tr>
+      <tr><td>KEY · HEX 를 1 이 켜짐으로 가정</td><td>DE1-SoC 는 둘 다 0 이 켜짐(눌림)</td><td>보드에서 반대로 동작 · 부록 G</td></tr>
+      <tr><td>핀 번호를 지어냄</td><td>보드가 아무 반응 없음</td><td>제공된 <code>.qsf</code> 만 씀</td></tr>
+      <tr><td><code>component</code> 선언으로 길게 씀</td><td>틀린 것은 아님. 이 과목은 <code>entity work.이름</code> 방식</td><td>3주차 15장</td></tr>
+      <tr><td>한 신호를 두 곳에서 대입</td><td>충돌 — waveform 에 <code>X</code></td><td>waveform · 대입문의 왼쪽 이름</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="step">
+  <div class="step-head"><span class="step-no">4</span><h2>리뷰 요청 프롬프트 (9~11주, 프로젝트)</h2></div>
+  <p class="lead">각 주차 페이지에 그 주 사양이 들어간 프롬프트가 준비되어 있습니다. 뼈대는 아래와 같습니다.</p>
+  <div class="tpl">
+    <div class="q-row"><b>리뷰만 받기</b> <button class="btn" type="button" data-copy="tpl-review">복사</button></div>
+<pre id="tpl-review">너는 VHDL 코드 리뷰어다. 아래는 내가 AI 없이 직접 쓴 (파일 이름) 이다.
+
+[사양] (설계 사양 표를 내 말로)
+[과목 규약] VHDL-2008, ieee.numeric_std 만 사용, rising_edge, synchronous reset, synthesis 가능한 코드.
+
+[요청]
+1. 고친 전체 코드는 주지 마라. 지적만 해라.
+2. 지적은 많아야 5개. 각각 (줄 번호) (무엇이 문제인지) (왜 문제인지) (어떤 입력이나 waveform 으로 확인할 수 있는지) 를 적어라.
+3. 사양의 경계에서 틀리기 쉬운 테스트 입력 3개를 제안해라.
+4. 확신이 없는 지적에는 '불확실' 이라고 표시해라.</pre>
+  </div>
+  <div class="tpl">
+    <div class="q-row"><b>오류 메시지 풀이 (프로젝트)</b> <button class="btn" type="button" data-copy="tpl-err">복사</button></div>
+<pre id="tpl-err">아래는 Quartus(또는 GHDL) 오류 메시지와, 그 줄 앞뒤 10줄이다.
+오류가 무슨 뜻인지, 원인 후보를 가능성 높은 순으로 3개 설명해라. 고친 코드는 주지 말고, 내가 확인할 방법을 알려 줘라.</pre>
+  </div>
+</section>
+
+<section class="step">
+  <div class="step-head"><span class="step-no">5</span><h2>AI 사용 기록 — 보고서에 들어간다</h2></div>
+  <p class="lead">사이트에 적은 것은 제출 보고서 PDF 에 그대로 들어갑니다.</p>
+  <table class="spec">
+    <thead><tr><th>주차</th><th>보고서에 들어가는 것</th><th>배점</th></tr></thead>
+    <tbody>
+      <tr><td>4~7주 수업 중</td><td>고친 코드와 실행 결과 · 찾은 버그(줄 · 무엇 · 근거) · 다음에 프롬프트에 더할 것</td><td>6점</td></tr>
+      <tr><td>9~11주 수업 후</td><td>AI 리뷰 원문 · 지적 3개의 판정과 근거 · 코드를 고쳤는지</td><td>6점</td></tr>
+      <tr><td>13주 설계서</td><td>AI 사용 기록 표 (물은 것 · 받아들인 것 · 틀린 것과 알아챈 방법)</td><td>설계서에 포함</td></tr>
+      <tr><td>15주 최종 보고서</td><td>AI 결과의 오류를 찾아 고친 사례 2건</td><td>최종 보고서에 포함</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="step">
+  <div class="step-head"><span class="step-no">6</span><h2>AI 에게 보내지 않는 것</h2></div>
+  <ul>
+    <li>학번 · 이름 · 연락처 같은 개인정보</li>
+    <li>과제 골격과 과제 문제 — 과제 코드는 AI 없이 쓰고, 다 쓴 뒤에만 리뷰를 받습니다</li>
+    <li>AI 코드 감별 문제 — 감별은 AI 없이 합니다</li>
+    <li>시험 문제</li>
+  </ul>
+</section>
+
+<section class="step">
+  <div class="step-head"><span class="step-no">※</span><h2>참고</h2></div>
+  <p class="lead"><a href="https://bctcaiedu.github.io/arduino/?role=teacher#method" target="_blank" rel="noopener">「AI로 배우는 아두이노와 사물인터넷」의 AI 시대 학습법</a>을 참고했습니다.
+    다만 이 과목은 하드웨어 설계의 특성(코드가 그럴듯해도 회로가 틀릴 수 있다는 점)에 맞춰, AI 를 코드 작성자가 아니라 <b>리뷰·검증 파트너</b>로 둡니다.</p>
+</section>
+
+</div></main>
+
+<footer><div class="wrap">한경국립대학교 ICT로봇공학전공 · AX 디지털시스템</div></footer>
+
+<script>
+  document.querySelectorAll("[data-copy]").forEach((b) => b.addEventListener("click", async () => {
+    const t = document.getElementById(b.dataset.copy).textContent;
+    try { await navigator.clipboard.writeText(t); b.textContent = "복사됨"; } catch (_) { b.textContent = "선택해서 복사"; }
+    setTimeout(() => (b.textContent = "복사"), 1500);
+  }));
+  const th = (() => { try { return localStorage.getItem("vhdl-theme"); } catch (_) { return null; } })();
+  if (th) document.documentElement.setAttribute("data-theme", th);
+  document.getElementById("theme").addEventListener("click", () => {
+    const cur = document.documentElement.getAttribute("data-theme");
+    const next = cur === "dark" ? "light" : cur === "light" ? "dark"
+      : (matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "dark");
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("vhdl-theme", next); } catch (_) {}
+  });
+</script>
+</body>
+</html>

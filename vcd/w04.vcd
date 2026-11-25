@@ -1,0 +1,104 @@
+$date
+  Wed Oct 21 14:32:53 2026
+$end
+$version
+  GHDL v0
+$end
+$timescale
+  1 fs
+$end
+$scope module standard $end
+$upscope $end
+$scope module textio $end
+$upscope $end
+$scope module std_logic_1164 $end
+$upscope $end
+$scope module numeric_std $end
+$upscope $end
+$scope module tb_hex7seg_wave $end
+$var reg 4 ! d[3:0] $end
+$var reg 1 " blank $end
+$var reg 7 # seg[6:0] $end
+$var reg 1 $ seg_g $end
+$scope module dut $end
+$var reg 4 % d[3:0] $end
+$var reg 1 & blank $end
+$var reg 7 ' seg[6:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+b0000 !
+0"
+b1000000 #
+1$
+b0000 %
+0&
+b1000000 '
+#20000000
+b0001 !
+b1111001 #
+b0001 %
+b1111001 '
+#40000000
+b1000 !
+b0000000 #
+0$
+b1000 %
+b0000000 '
+#60000000
+1"
+b1111111 #
+1$
+1&
+b1111111 '
+#80000000
+b1010 !
+0"
+b0001000 #
+0$
+b1010 %
+0&
+b0001000 '
+#100000000
+b1011 !
+b0000011 #
+b1011 %
+b0000011 '
+#120000000
+b1100 !
+b1000110 #
+1$
+b1100 %
+b1000110 '
+#140000000
+b1111 !
+b0001110 #
+0$
+b1111 %
+b0001110 '
+#160000000
+1"
+b1111111 #
+1$
+1&
+b1111111 '
+#180000000
+b0101 !
+0"
+b0010010 #
+0$
+b0101 %
+0&
+b0010010 '
+#200000000
+b1001 !
+b0010000 #
+b1001 %
+b0010000 '
+#220000000
+b0110 !
+b0000010 #
+b0110 %
+b0000010 '
+#240000000

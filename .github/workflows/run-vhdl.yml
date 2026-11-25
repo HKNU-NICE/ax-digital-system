@@ -1,0 +1,123 @@
+# ------------------------------------------------------------------
+# 사이트에서 보낸 VHDL 한 건을 GHDL 로 분석·시뮬레이션하고
+# 결과를 Apps Script 로 돌려준다.
+#   트리거 : repository_dispatch (event_type = vhdl-run)
+#   필요한 Secrets : CALLBACK_URL, CALLBACK_SECRET
+# ------------------------------------------------------------------
+name: VHDL 실행
+
+on:
+  repository_dispatch:
+    types: [vhdl-run]
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5                 # 무한 루프 제출로 분을 태우지 않도록
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 제출 코드 복원
+        env:
+          CODE_B64: ${{ github.event.client_payload.codeB64 }}
+        run: |
+          printf '%s' "$CODE_B64" | base64 -d > submission.vhd
+          bytes=$(wc -c < submission.vhd)
+          echo "제출 크기: ${bytes} bytes"
+          if [ "$bytes" -gt 20000 ]; then echo "too large" >&2; exit 2; fi
+
+      - uses: ghdl/setup-ghdl@v1
+        with:
+          version: '6.0.0'
+          backend: mcode
+
+      - name: 주차별 채점 대상 정하기
+        env:
+          LAB: ${{ github.event.client_payload.lab }}
+        run: |
+          # 끝에 p 가 붙으면 "따라 만들기"(실습), 없으면 "설계"(과제)
+          # 주차를 늘릴 때는 이 표에 두 줄만 더하면 된다
+          case "$LAB" in
+            lab00p) WK=w01; TOP=lab00_sw_led;     TB=tb_lab00_check;            DEPS=""; RUNARGS="--ieee-asserts=disable" ;;
+            lab00)  WK=w01; TOP=lab00_or_nand;    TB=tb_lab00_or_nand_check;    DEPS=""; RUNARGS="--ieee-asserts=disable" ;;
+            lab01p) WK=w02; TOP=gates;            TB=tb_gates_check;            DEPS=""; RUNARGS="--ieee-asserts=disable" ;;
+            lab01)  WK=w02; TOP=gates7;           TB=tb_gates7_check;           DEPS=""; RUNARGS="--ieee-asserts=disable" ;;
+            lab02p) WK=w03; TOP=mux4_1;           TB=tb_mux4_1_check;           DEPS=""; RUNARGS="--ieee-asserts=disable" ;;
+            lab02)  WK=w03; TOP=mux4_1_we;        TB=tb_mux4_1_we_check;        DEPS=""; RUNARGS="--ieee-asserts=disable" ;;
+            lab03p) WK=w04; TOP=hex7seg_case;     TB=tb_hex7seg_case_check;     DEPS="grader/w04/ref_seg_table.vhd"; RUNARGS="--ieee-asserts=disable" ;;
+            lab03)  WK=w04; TOP=hex7seg_ws;       TB=tb_hex7seg_ws_check;       DEPS="grader/w04/ref_seg_table.vhd"; RUNARGS="--ieee-asserts=disable" ;;
+            lab04p) WK=w05; TOP=adder4;           TB=tb_adder4_check;           DEPS="grader/w05/deps.vhd"; RUNARGS="--ieee-asserts=disable" ;;
+            lab04)  WK=w05; TOP=addsub8;          TB=tb_addsub8_check;          DEPS=""; RUNARGS="--ieee-asserts=disable --stop-time=300us" ;;
+            lab05p) WK=w06; TOP=reg8;             TB=tb_reg8_check;             DEPS=""; RUNARGS="--ieee-asserts=disable --stop-time=20us" ;;
+            lab05)  WK=w06; TOP=led_bounce;       TB=tb_led_bounce_check;       DEPS=""; RUNARGS="--ieee-asserts=disable --stop-time=20us" ;;
+            lab06p) WK=w07; TOP=counter4;         TB=tb_counter4_check;         DEPS=""; RUNARGS="--ieee-asserts=disable --stop-time=20us" ;;
+            lab06)  WK=w07; TOP=counter4_down;    TB=tb_counter4_down_check;    DEPS=""; RUNARGS="--ieee-asserts=disable --stop-time=20us" ;;
+            lab07p) WK=w09; TOP=seq_det_moore;    TB=tb_seq_det_moore_check;    DEPS=""; RUNARGS="--ieee-asserts=disable --stop-time=50us" ;;
+            lab07)  WK=w09; TOP=seq_det110_mealy; TB=tb_seq_det110_mealy_check; DEPS=""; RUNARGS="--ieee-asserts=disable --stop-time=50us" ;;
+            lab08p) WK=w10; TOP=traffic_light;    TB=tb_traffic_light_check;    DEPS=""; RUNARGS="--ieee-asserts=disable --stop-time=60us" ;;
+            lab08)  WK=w10; TOP=traffic_night;    TB=tb_traffic_night_check;    DEPS=""; RUNARGS="--ieee-asserts=disable --stop-time=80us" ;;
+            lab09p) WK=w11; TOP=clock_mmss;       TB=tb_clock_mmss_check;       DEPS="grader/w11/dep_seg_pkg.vhd grader/w11/dep_counter_mod.vhd"; RUNARGS="--ieee-asserts=disable --stop-time=60us" ;;
+            lab09)  WK=w11; TOP=clock_hhmmss;     TB=tb_clock_hhmmss_check;     DEPS="grader/w11/dep_seg_pkg.vhd grader/w11/dep_counter_mod.vhd"; RUNARGS="--ieee-asserts=disable --stop-time=2ms" ;;
+            lab10p) WK=w12; TOP=reg_file;         TB=tb_reg_file_check;         DEPS=""; RUNARGS="--ieee-asserts=disable --stop-time=40us" ;;
+            lab10)  WK=w12; TOP=ram_sp;           TB=tb_ram_sp_check;           DEPS=""; RUNARGS="--ieee-asserts=disable --stop-time=40us" ;;
+            *) echo "모르는 실습 이름: $LAB" >&2; exit 2 ;;
+          esac
+          {
+            echo "WK=$WK"
+            echo "TOP=$TOP"
+            echo "TB=$TB"
+            echo "DEPS=$DEPS"
+            echo "RUNARGS=$RUNARGS"
+            echo "RUNARGS=$RUNARGS"
+            echo "RUNARGS=$RUNARGS"
+          } >> $GITHUB_ENV
+
+      - name: 분석 · 시뮬레이션
+        id: run
+        continue-on-error: true
+        run: |
+          mkdir -p wk
+          : > out.log
+          if ! ghdl -a --std=08 --workdir=wk \
+                 $DEPS submission.vhd "grader/${WK}/${TB}.vhd" >> out.log 2>&1 ; then
+            echo "STATUS=compile_error" >> $GITHUB_ENV
+            exit 0
+          fi
+          # 합성 가능성 1차 점검 — 래치·비합성 구문을 Quartus 전에 잡는다
+          echo "---- 합성 점검 (ghdl --synth) ----" >> out.log
+          if ! ghdl --synth --std=08 --workdir=wk "$TOP" > /dev/null 2>> out.log ; then
+            echo "합성할 수 없는 코드입니다. Quartus 에서도 같은 문제가 납니다." >> out.log
+            echo "STATUS=synth_error" >> $GITHUB_ENV
+            exit 0
+          fi
+          echo "합성 점검 통과 (래치 없음)" >> out.log
+          if timeout 120 ghdl -r --std=08 --workdir=wk "$TB" \
+                 $RUNARGS >> out.log 2>&1 ; then
+            echo "STATUS=pass" >> $GITHUB_ENV
+          else
+            echo "STATUS=fail" >> $GITHUB_ENV
+          fi
+
+      - name: 결과 회신
+        if: always()
+        env:
+          CALLBACK: ${{ secrets.CALLBACK_URL }}
+          SECRET:   ${{ secrets.CALLBACK_SECRET }}
+          JOB:      ${{ github.event.client_payload.jobId }}
+          SID:      ${{ github.event.client_payload.sid }}
+          LAB:      ${{ github.event.client_payload.lab }}
+        run: |
+          [ -f out.log ] || echo "실행 전 단계에서 중단되었습니다." > out.log
+          # 학생에게 보여 줄 만큼만 자른다 (앞 200줄)
+          head -c 20000 out.log | sed 's/\x1b\[[0-9;]*m//g' > show.log
+          jq -n --arg a "result" --arg s "$SECRET" --arg j "$JOB" \
+                --arg sid "$SID" --arg lab "$LAB" \
+                --arg st "${STATUS:-error}" --rawfile log show.log \
+                '{action:$a, secret:$s, jobId:$j, sid:$sid, lab:$lab, status:$st, log:$log}' \
+                > payload.json
+          curl -sS -X POST "$CALLBACK" \
+               -H "Content-Type: text/plain;charset=utf-8" \
+               --data-binary @payload.json -L -o /dev/null -w "회신 HTTP %{http_code}\n"
